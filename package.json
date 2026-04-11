@@ -1,0 +1,16 @@
+{
+  "name": "my_major_project",
+  "version": "1.0.0",
+  "description": "a complete major full stack project",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Bhavya Varshney",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
