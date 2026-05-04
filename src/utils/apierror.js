@@ -20,7 +20,7 @@ class APIError extends Error {
         if (stack) {
             this.stack = stack
         } else {
-            Error.captureStackTrace(this, this.constructor)
+            Error.captureStackTrace(this, this.constructor)   // helps in debugging and tracing the exact error origin
         }
     }
 }
