@@ -24,3 +24,5 @@ class APIResponse {
         }
     }
 }
+
+export { APIResponse }
