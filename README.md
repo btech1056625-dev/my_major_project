@@ -223,11 +223,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, email support@majorproject.com or open an issue on the repository.
+For support, email bhavyavarshney749@gmail.com or open an issue on the repository.
 
 ## 👥 Authors
 
-- **Developer**: Your Name
+- **Developer**: Bhavya Varshney
 - **Project**: Major Project - YouTube & Twitter Clone Integration
 
 ## 🙏 Acknowledgments
