@@ -1,13 +1,13 @@
-import {ayschandler} from '../utils/ayschandler.js';
+import {asynchandler} from '../utils/asynchandler.js';
 
-const registerUser = ayschandler(async (req, res) => {
+const registerUser = asynchandler(async (req, res) => {
     res.status(200).json({
         message: "User registered successfully",
         success: true
     })
 })
 
-const loginUser = ayschandler(async (req, res) => {
+const loginUser = asynchandler(async (req, res) => {
     res.status(200).json({
         message: "User logged in successfully",
         success: true

@@ -11,13 +11,13 @@ app.use(cors({
 
 // Routes
 import userRoutes from "./routes/user.routes.js";
-import tweetRoutes from "./routes/tweet.routes.js";
-import subscriptionRoutes from "./routes/subscription.routes.js";
+//import tweetRoutes from "./routes/tweet.routes.js";
+//import subscriptionRoutes from "./routes/subscription.routes.js";
 
 //routes declaration
-app.use("/api/users", userRoutes);
-app.use("/api/tweets", tweetRoutes);
-app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/v1/users", userRoutes);
+//app.use("/api/v1/tweets", tweetRoutes);
+//app.use("/api/v1/subscriptions", subscriptionRoutes);
 
 
 app.use(express.json({ limit: "16kb" }))  // used for sending JSON data
