@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-
+// like model for the user liking the video and tweets
 const likeSchema = new Schema(
     {
         user: {

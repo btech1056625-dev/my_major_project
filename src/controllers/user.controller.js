@@ -3,6 +3,7 @@ import { User } from '../models/User.model.js';
 import { APIError } from '../utils/apierror.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
 import { APIResponse } from '../utils/apiresponse.js';
+import { Playlist } from '../models/playlist.model.js';
 
 const registerUser = asynchandler(async (req, res) => {
     const { username, email, fullName, password } = req.body;
@@ -106,4 +107,87 @@ const loginUser = asynchandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser };
+// Get user's liked videos
+const getUserLikedVideos = asynchandler(async (req, res) => {
+    const { userId } = req.params;
+
+    // Step 1: Fetch user with liked videos populated
+    const user = await User.findById(userId)
+        .populate({
+            path: 'likedVideos',
+            populate: { path: 'owner', select: 'username avatar' }
+        });
+
+    if (!user) {
+        throw new APIError("User not found", 404);
+    }
+
+    return res.status(200).json(
+        new APIResponse("User liked videos fetched", 200, {
+            totalLiked: user.likedVideos.length,
+            likedVideos: user.likedVideos
+        })
+    );
+});
+
+// Get user's liked playlist
+const getUserLikedPlaylist = asynchandler(async (req, res) => {
+    const { userId } = req.params;
+
+    // Step 1: Fetch user
+    const user = await User.findById(userId).select('likedPlaylist');
+
+    if (!user) {
+        throw new APIError("User not found", 404);
+    }
+
+    // Step 2: Fetch liked playlist with video details
+    const likedPlaylist = await Playlist.findById(user.likedPlaylist)
+        .populate({
+            path: 'videos',
+            populate: { path: 'owner', select: 'username avatar' }
+        });
+
+    if (!likedPlaylist) {
+        return res.status(200).json(
+            new APIResponse("No liked playlist created yet", 200, null)
+        );
+    }
+
+    return res.status(200).json(
+        new APIResponse("Liked playlist fetched", 200, likedPlaylist)
+    );
+});
+
+// Get user profile
+const getUserProfile = asynchandler(async (req, res) => {
+    const { userId } = req.params;
+
+    // Step 1: Fetch user profile
+    const user = await User.findById(userId)
+        .select('-password -refreshToken')
+        .populate({
+            path: 'watchHistory',
+            options: { limit: 10 }
+        });
+
+    if (!user) {
+        throw new APIError("User not found", 404);
+    }
+
+    // Step 2: Get user stats
+    const likedVideosCount = user.likedVideos.length;
+    const watchHistoryCount = user.watchHistory.length;
+
+    return res.status(200).json(
+        new APIResponse("User profile fetched", 200, {
+            user,
+            stats: {
+                likedVideos: likedVideosCount,
+                watchHistory: watchHistoryCount
+            }
+        })
+    );
+});
+
+export { registerUser, loginUser, getUserLikedVideos, getUserLikedPlaylist, getUserProfile };

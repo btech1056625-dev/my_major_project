@@ -1,5 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 
+// playlist model for the user having its channel and videos in the playlist
 const playlistschema = new Schema({
     title: {
         type: String,

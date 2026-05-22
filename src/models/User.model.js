@@ -40,6 +40,16 @@ const userSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Video"
         }],
+        likedVideos: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Video"
+            }
+        ],
+        likedPlaylist: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Playlist"
+        },
         refreshToken: {
             type: String
         }
@@ -48,6 +58,7 @@ const userSchema = new Schema(
     { timestamps: true }   // this line will help you to track the creation and updation time of the document
 )
 
+// Authentication and Authorization related methods [middleware and instance methods]
 userSchema.pre("save", async function (next) {   // pre middleware
     if (!this.isModified("password")) return next();  // if password is not modified then don't hash it
 
