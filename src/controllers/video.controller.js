@@ -191,44 +191,7 @@ const deleteVideo = asynchandler(async (req, res) => {
 });
 
 export { publishVideo, getAllVideos, getVideoById, updateVideo, deleteVideo };
-    }
-    res.status(200).json(new APIResponse(200, video, "Video fetched successfully"))
-})
-
-const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
-    const { title, description } = req.body
-    const video = await Video.findById(videoId)
-    if (!video) {
-        throw new APIError("Video not found", 404)
-    }
-    // Check if the user is the owner of the video
-    if (video.owner.toString() !== req.user._id.toString()) {
-        throw new APIError("Only the owner can update the video", 403)
-    }
-    // Update video details
-    video.title = title
-    video.description = description
-    await video.save()
-    res.status(200).json(new APIResponse(200, video, "Video updated successfully"))
-})
-
-const deleteVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-    //TODO: delete video
-    const video = await Video.findById(videoId)
-    if (!video) {
-        throw new APIError("Video not found", 404)
-    }
-    // Check if the user is the owner of the video
-    if (video.owner.toString() !== req.user._id.toString()) {
-        throw new APIError("Only the owner can delete the video", 403)
-    }
-    // Delete the video
-    await Video.findByIdAndDelete(videoId)
-    res.status(200).json(new APIResponse(200, null, "Video deleted successfully"))
-})
+    
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
