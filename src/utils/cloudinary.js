@@ -1,5 +1,6 @@
 import {v2 as cloudinary} from "cloudinary";
 import fs from "fs";
+import path from "path";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,11 +17,24 @@ const uploadToCloudinary = async (filePath, folder) => {
             folder: folder
         });
         console.log("File uploaded to Cloudinary:", result.secure_url);
-        
-        fs.unlinkSync(filePath);
+        try {
+            const absolutePath = path.resolve(filePath);
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
+        } catch (deleteError) {
+            console.warn("Could not delete temporary file:", deleteError.message);
+        }
         return result;
     } catch (error) {
-        fs.unlinkSync(filePath);
+        try {
+            const absolutePath = path.resolve(filePath);
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
+        } catch (deleteError) {
+            console.warn("Could not delete temporary file after failure:", deleteError.message);
+        }
         throw error;
     }
 };
