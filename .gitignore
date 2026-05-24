@@ -127,4 +127,7 @@ dist
 .env.test
 .env.production
 
+#test
+tests/
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
