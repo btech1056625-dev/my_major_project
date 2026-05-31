@@ -6,7 +6,7 @@ class APIError extends Error {
         errors,
         stack = ""
     ) {
-        //super(message)
+        super(message)
         this.statusCode = statusCode
         this.data = data
         this.errors = errors
@@ -16,11 +16,10 @@ class APIError extends Error {
         this.data = null
         this.errors = errors
 
-
         if (stack) {
             this.stack = stack
         } else {
-            Error.captureStackTrace(this, this.constructor)   // helps in debugging and tracing the exact error origin
+            Error.captureStackTrace(this, this.constructor)
         }
     }
 }

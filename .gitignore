@@ -130,4 +130,7 @@ dist
 #test
 tests/
 
+#reports
+newman-report.json
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node

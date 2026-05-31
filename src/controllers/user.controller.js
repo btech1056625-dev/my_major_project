@@ -22,23 +22,23 @@ const registerUser = asynchandler(async (req, res) => {
         throw new APIError("User with this email or username already exists", 409);
     }
 
-    // Step 3: Handle file uploads to Cloudinary
+    // Step 3: Handle file uploads to Cloudinary or fallback to placeholders
     let avatarUrl, coverImageUrl;
 
     if (req.files && req.files.avatar) {
         const avatarFile = req.files.avatar[0];
         const avatarUploadResult = await uploadToCloudinary(avatarFile.path);
-        avatarUrl = avatarUploadResult.secure_url;
+        avatarUrl = avatarUploadResult?.secure_url || "https://via.placeholder.com/150";
     } else {
-        throw new APIError("Avatar image is required", 400);
+        avatarUrl = "https://via.placeholder.com/150";
     }
 
     if (req.files && req.files.coverImage) {
         const coverImageFile = req.files.coverImage[0];
         const coverImageUploadResult = await uploadToCloudinary(coverImageFile.path);
-        coverImageUrl = coverImageUploadResult.secure_url;
+        coverImageUrl = coverImageUploadResult?.secure_url || "https://via.placeholder.com/1024x512";
     } else {
-        throw new APIError("Cover image is required", 400);
+        coverImageUrl = "https://via.placeholder.com/1024x512";
     }
 
     // Step 4: Create new user in database

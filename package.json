@@ -13,14 +13,16 @@
   "scripts": {
     "dev": "nodemon dotenv/config src/index.js",
       "start": "node src/index.js",
-    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "postman:test": "newman run tests/postman_collection.json -e tests/postman_environment.json"
   },
   "devDependencies": {
     "dotenv-flow": "^4.1.0",
     "jest": "^30.4.2",
     "mongodb-memory-server": "^11.1.0",
     "nodemon": "^3.1.14",
-    "prettier": "^3.8.2"
+    "prettier": "^3.8.2",
+    "newman": "^5.1.1"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

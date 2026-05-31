@@ -1,46 +1,59 @@
 import mongoose from "mongoose"
-import {Comment} from "../models/comment.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import { Comment } from "../models/comment.model.js"
+import { APIError } from "../utils/apierror.js"
+import { APIResponse } from "../utils/Apiresponse.js"
+import { asynchandler } from "../utils/asynchandler.js"
 
-const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
-    const {videoId} = req.params
-    const {page = 1, limit = 10} = req.query
-    const comments = await Comment.find({video: videoId})
+const getVideoComments = asynchandler(async (req, res) => {
+    const { videoId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new APIError("Invalid video ID", 400);
+    }
+
+    const comments = await Comment.find({ video: videoId })
         .skip((page - 1) * limit)
-        .limit(limit)
+        .limit(limit);
 
     return res.status(200).json(
-        new ApiResponse("Comments fetched successfully", 200, comments)
+        new APIResponse("Comments fetched successfully", 200, comments)
     );
 });
 
-const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
-    const {videoId} = req.params
-    const {content} = req.body
+const addComment = asynchandler(async (req, res) => {
+    const { videoId } = req.params;
+    const { content } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new APIError("Invalid video ID", 400);
+    }
+
     if (!content || content.trim() === "") {
-        throw new ApiError("Content is required", 400)
-    }   
+        throw new APIError("Content is required", 400);
+    }
+
     const comment = await Comment.create({
         content,
         video: videoId,
-        owner: req.user._id // Assuming you have authentication middleware that sets req.user
-    })
+        owner: req.user._id
+    });
+
     return res.status(201).json(
-        new ApiResponse("Comment added successfully", 201, comment)
+        new APIResponse("Comment added successfully", 201, comment)
     );
 });
 
-const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
-    const {commentId} = req.params
-    const {content} = req.body
+const updateComment = asynchandler(async (req, res) => {
+    const { commentId } = req.params;
+    const { content } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        throw new APIError("Invalid comment ID", 400);
+    }
 
     if (!content || content.trim() === "") {
-        throw new ApiError("Content is required", 400)
+        throw new APIError("Content is required", 400);
     }
 
     const comment = await Comment.findByIdAndUpdate(
@@ -50,24 +63,28 @@ const updateComment = asyncHandler(async (req, res) => {
     )
 
     if (!comment) {
-        throw new ApiError("Comment not found", 404)
+        throw new APIError("Comment not found", 404)
     }
 
     return res.status(200).json(
-        new ApiResponse("Comment updated successfully", 200, comment)
+        new APIResponse("Comment updated successfully", 200, comment)
     )
 })
 
-const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
-    const {commentId} = req.params
+const deleteComment = asynchandler(async (req, res) => {
+    const { commentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+        throw new APIError("Invalid comment ID", 400);
+    }
+
     const comment = await Comment.findByIdAndDelete(commentId)
 
     if (!comment) {
-        throw new ApiError("Comment not found", 404)
+        throw new APIError("Comment not found", 404)
     }
     return res.status(200).json(
-        new ApiResponse("Comment deleted successfully", 200, comment)
+        new APIResponse("Comment deleted successfully", 200, comment)
     )
 })
 

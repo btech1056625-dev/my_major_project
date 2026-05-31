@@ -192,7 +192,7 @@ const deleteVideo = asynchandler(async (req, res) => {
 
 
     
-const togglePublishStatus = asyncHandler(async (req, res) => {
+const togglePublishStatus = asynchandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: toggle publish status of the video
     const video = await Video.findById(videoId)
@@ -205,35 +205,14 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     }
     video.isPublished = !video.isPublished
     await video.save()
-    res.status(200).json(new APIResponse(200, video, "Publish status updated successfully"))
-    const uploadVideo = asyncHandler(async(req,res) => {
-        const {title, description} = req.body
-        const videoFile = req.files?.videoFile[0]
-        const thumbnail = req.files?.thumbnail[0]
-
-        if(!videoFile){
-            throw new APIError(400,"Video file is required")
-        }
-
-        const video = await Video.create({
-            title,
-            description,
-            videoFile : videoFile.path,
-            thumbnail : thumbnail.path,
-            owner : req.user._id
-        })
-
-        return res.status(200).json(
-            new APIResponse(200,video,"Video uploaded successfully")
-        )
-    })
+    return res.status(200).json(new APIResponse(200, video, "Publish status updated successfully"))
 })
 
 export {
     getAllVideos,
-    publishAVideo,
+    publishVideo,
     getVideoById,
     updateVideo,
     deleteVideo,
     togglePublishStatus
-}  
+}

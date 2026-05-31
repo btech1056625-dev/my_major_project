@@ -59,11 +59,10 @@ const userSchema = new Schema(
 )
 
 // Authentication and Authorization related methods [middleware and instance methods]
-userSchema.pre("save", async function (next) {   // pre middleware
-    if (!this.isModified("password")) return next();  // if password is not modified then don't hash it
+userSchema.pre("save", async function () {   // pre middleware
+    if (!this.isModified("password")) return;  // if password is not modified then don't hash it
 
     this.password = await bcrypt.hash(this.password, 10)  // hash the password
-    next()   // call the next middleware
 })
 
 userSchema.methods.isPasswordCorrect = async function (password) {
