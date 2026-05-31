@@ -1,28 +1,27 @@
-# Major Project — YouTube & Twitter Clone (Backend)
+﻿# YouTube × Twitter — Backend API
 
-A production-grade **Node.js / Express** REST API that merges the core features of YouTube (video sharing, playlists, subscriptions) and Twitter (tweets, likes, comments) into one unified platform.
-
----
-
-## 🎯 Project Overview
-
-This backend-only application exposes a versioned REST API (`/api/v1`) covering user authentication, video management, social interactions, and analytics. It is designed to be consumed by any frontend (React, Next.js, mobile, etc.) and follows clean MVC conventions throughout.
+> A polished and professional **Node.js + Express** backend designed for hybrid media, social, and content experiences.
 
 ---
 
-## ✨ Features
+## 📌 Overview
 
-| Domain | Highlights |
-|---|---|
-| **User System** | Registration with avatar & cover image, JWT login, profile pages, liked-video history |
-| **Video Management** | Upload & publish videos, CRUD operations, toggle publish status, paginated listing |
-| **Tweets** | Create, read, update, delete tweets |
-| **Comments** | Comment on videos; edit & delete your own comments |
-| **Likes** | Toggle likes on videos, comments, and tweets; fetch all liked videos |
-| **Playlists** | Create playlists, add/remove videos, full CRUD |
-| **Subscriptions** | Subscribe/unsubscribe to channels; list subscribers & subscribed channels |
-| **Dashboard** | Channel-level stats and video analytics |
-| **Health Check** | Simple liveness probe endpoint |
+A modern REST API for seamless video, tweet, comment, like, playlist, and subscription workflows.
+
+This backend is built for frontend-agnostic integration and follows a clean MVC-style architecture with robust middleware, centralized error handling, and media upload support.
+
+---
+
+## ✨ Highlights
+
+- **Video publishing:** upload, edit, delete, publish/unpublish
+- **Social microblogging:** create, update, delete tweets
+- **Engagement:** like videos, comments, tweets
+- **Comments:** full comment lifecycle for videos
+- **Playlists:** build, manage, and maintain playlists
+- **Subscriptions:** follow channels and view subscriptions
+- **Dashboard:** channel analytics and video performance
+- **Health check:** lightweight readiness endpoint
 
 ---
 
@@ -32,29 +31,31 @@ This backend-only application exposes a versioned REST API (`/api/v1`) covering 
 |---|---|
 | Runtime | Node.js v24 |
 | Framework | Express.js v5 |
-| Database | MongoDB + Mongoose v9 (with `mongoose-aggregate-paginate-v2`) |
-| Authentication | JSON Web Tokens (`jsonwebtoken`) + `bcrypt` |
-| File Uploads | Multer → Cloudinary |
-| Security | CORS, `cookie-parser` |
-| Environment | `dotenv` / `dotenv-flow` |
-| Dev Server | Nodemon |
-| Code Style | Prettier |
-| Testing | Jest, `mongodb-memory-server`, Newman (Postman) |
+| Database | MongoDB + Mongoose v9 |
+| Authentication | JWT + bcrypt |
+| Uploads | Multer + Cloudinary |
+| Configuration | dotenv / dotenv-flow |
+| Testing | Jest + Newman |
+| Formatting | Prettier |
 
 ---
 
-## 📋 Prerequisites
+## 🔐 Authentication
 
-- **Node.js** ≥ 18 (project uses v24)
-- **npm** ≥ 9
-- A **MongoDB** instance (local or MongoDB Atlas)
-- A **Cloudinary** account (for media uploads)
+The API uses JWT bearer tokens to protect sensitive endpoints.
+
+Authentication is handled in `src/middlewares/auth.middleware.js`.
+
+- reads `Authorization: Bearer <token>`
+- validates the token with `ACCESS_TOKEN_SECRET`
+- attaches `req.user` for secured controllers
+- rejects invalid or expired tokens with `401 Unauthorized`
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone the repository
+### 1. Clone repository
 ```bash
 git clone <repository-url>
 cd MY_MAJOR_PROJECT
@@ -65,94 +66,55 @@ cd MY_MAJOR_PROJECT
 npm install
 ```
 
-### 3. Configure environment variables
-Create a `.env` file in the project root:
+### 3. Configure environment
+Create `.env` and add:
+
 ```env
 PORT=8000
 MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net
 CORS_ORIGIN=http://localhost:3000
-
-JWT_SECRET=<your-jwt-secret>
+ACCESS_TOKEN_SECRET=<access-token-secret>
+JWT_SECRET=<jwt-secret>
 JWT_EXPIRY=1d
-REFRESH_TOKEN_SECRET=<your-refresh-token-secret>
+REFRESH_TOKEN_SECRET=<refresh-token-secret>
 REFRESH_TOKEN_EXPIRY=10d
-
-CLOUDINARY_NAME=<your-cloudinary-cloud-name>
-CLOUDINARY_API_KEY=<your-cloudinary-api-key>
-CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
+CLOUDINARY_NAME=<cloudinary-cloud-name>
+CLOUDINARY_API_KEY=<cloudinary-api-key>
+CLOUDINARY_API_SECRET=<cloudinary-api-secret>
 ```
 
-> ⚠️ **Note**: If your MongoDB password contains special characters (e.g. `@`), URL-encode them — `@` becomes `%40`.
+> Tip: URL-encode special characters in your MongoDB password.
 
-### 4. Start the development server
+### 4. Start the app
 ```bash
 npm run dev
 ```
-The API will be available at `http://localhost:8000`.
+
+The application should now be available at `http://localhost:8000`.
 
 ---
 
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
 MY_MAJOR_PROJECT/
 ├── src/
-│   ├── index.js                         # Entry point — DB connect → start server
-│   ├── app.js                           # Express app, middleware, route mounting
-│   ├── constants.js                     # Shared constants (DB_NAME, etc.)
-│   │
-│   ├── controllers/                     # Business logic (one file per domain)
-│   │   ├── user.controller.js
-│   │   ├── video.controller.js
-│   │   ├── tweet.controller.js
-│   │   ├── comment.controller.js
-│   │   ├── like.controller.js
-│   │   ├── playlist.contoller.js
-│   │   ├── subscription.controller.js
-│   │   ├── dashboard.contrller.js
-│   │   └── healthcheck.controller.js
-│   │
-│   ├── models/                          # Mongoose schemas
-│   │   ├── User.model.js
-│   │   ├── Video.model.js
-│   │   ├── Tweet.model.js
-│   │   ├── comment.model.js
-│   │   ├── like.model.js
-│   │   ├── playlist.model.js
-│   │   └── subscription.model.js
-│   │
-│   ├── routes/                          # Express routers (one file per domain)
-│   │   ├── user.routes.js
-│   │   ├── video.routes.js
-│   │   ├── tweet.routes.js
-│   │   ├── comment.routes.js
-│   │   ├── like.routes.js
-│   │   ├── playlist.routes.js
-│   │   ├── subscription.routes.js
-│   │   ├── dashboard.routes.js
-│   │   └── health.routes.js
-│   │
+│   ├── index.js
+│   ├── app.js
+│   ├── constants.js
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
 │   ├── middlewares/
-│   │   ├── auth.middleware.js           # JWT verification
-│   │   └── multer.middleware.js         # Multipart file upload
-│   │
 │   ├── db/
-│   │   └── db_connect.js               # MongoDB connection
-│   │
 │   └── utils/
-│       ├── asynchandler.js             # Wraps async controllers
-│       ├── apierror.js                 # Custom ApiError class
-│       ├── Apiresponse.js              # Standardised ApiResponse class
-│       └── cloudinary.js              # Cloudinary upload helper
-│
 ├── tests/
-│   ├── postman_collection.json         # Postman / Newman test suite
+│   ├── postman_collection.json
 │   ├── postman_environment.json
-│   ├── *.test.md                       # Per-feature test documentation
+│   ├── *.test.md
 │   └── helpers/
-│
-├── public/temp/                        # Temporary local file storage (gitignored)
-├── .env                                # Local environment variables (gitignored)
+├── public/temp/
+├── .env
 ├── .gitignore
 ├── jest.config.js
 ├── package.json
@@ -163,179 +125,179 @@ MY_MAJOR_PROJECT/
 
 ## 🔌 API Reference
 
-Base URL: `http://localhost:8000/api/v1`
+**Base URL:** `http://localhost:8000/api/v1`
 
-### 🔐 Users — `/api/v1/users`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/register` | ❌ | Register with avatar & cover image |
-| `POST` | `/login` | ❌ | Login; returns JWT |
-| `GET` | `/:userId/profile` | ❌ | Get public user profile |
-| `GET` | `/:userId/liked-videos` | ❌ | Get videos liked by a user |
-| `GET` | `/:userId/liked-playlist` | ❌ | Get playlists liked by a user |
-
-### 🎬 Videos — `/api/v1/videos`
+### Users
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/` | ❌ | List all (paginated) videos |
-| `POST` | `/` | ✅ | Upload & publish a video |
-| `GET` | `/:videoId` | ❌ | Get video by ID |
-| `PUT` | `/:videoId` | ✅ | Update video metadata |
-| `DELETE` | `/:videoId` | ✅ | Delete a video |
-| `PATCH` | `/:videoId/publish` | ✅ | Toggle publish status |
+| POST | `/users/register` | None | Create a user account |
+| POST | `/users/login` | None | Login and receive tokens |
+| POST | `/users/logout` | Required | Invalidate current session |
+| GET | `/users/:userId/profile` | None | Fetch user profile |
+| GET | `/users/:userId/liked-videos` | None | List liked videos |
+| GET | `/users/:userId/liked-playlist` | None | List liked playlists |
 
-### 🐦 Tweets — `/api/v1/tweets`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/` | ✅ | Create a tweet |
-| `GET` | `/user/:userId` | ❌ | Get all tweets by a user |
-| `PUT` | `/:tweetId` | ✅ | Update a tweet |
-| `DELETE` | `/:tweetId` | ✅ | Delete a tweet |
-
-### 💬 Comments — `/api/v1/comments`
+### Videos
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/video/:videoId` | ❌ | Get comments for a video |
-| `POST` | `/video/:videoId` | ✅ | Add a comment to a video |
-| `PUT` | `/:commentId` | ✅ | Edit a comment |
-| `DELETE` | `/:commentId` | ✅ | Delete a comment |
+| GET | `/videos` | None | List published videos |
+| POST | `/videos` | Required | Upload a new video |
+| GET | `/videos/:videoId` | Optional | Fetch video details |
+| PUT | `/videos/:videoId` | Required | Update a video |
+| DELETE | `/videos/:videoId` | Required | Remove a video |
+| PATCH | `/videos/:videoId/publish` | Required | Toggle publish state |
 
-### ❤️ Likes — `/api/v1/likes`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/video/:videoId/toggle` | ✅ | Toggle like on a video |
-| `POST` | `/comment/:commentId/toggle` | ✅ | Toggle like on a comment |
-| `POST` | `/tweet/:tweetId/toggle` | ✅ | Toggle like on a tweet |
-| `GET` | `/videos` | ✅ | Get all videos liked by me |
-
-### 📋 Playlists — `/api/v1/playlists`
+### Tweets
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/` | ✅ | Create a playlist |
-| `GET` | `/user/:userId` | ❌ | Get all playlists for a user |
-| `GET` | `/:playlistId` | ❌ | Get playlist by ID |
-| `PUT` | `/:playlistId` | ✅ | Update playlist details |
-| `DELETE` | `/:playlistId` | ✅ | Delete a playlist |
-| `POST` | `/:playlistId/video/:videoId` | ✅ | Add video to playlist |
-| `DELETE` | `/:playlistId/video/:videoId` | ✅ | Remove video from playlist |
+| POST | `/tweets` | Required | Create a tweet |
+| GET | `/tweets/user/:userId` | None | Get tweets for a user |
+| PUT | `/tweets/:tweetId` | Required | Edit a tweet |
+| DELETE | `/tweets/:tweetId` | Required | Delete a tweet |
 
-### 🔔 Subscriptions — `/api/v1/subscriptions`
+### Comments
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/:channelId/toggle` | ✅ | Subscribe / Unsubscribe to a channel |
-| `GET` | `/:channelId/subscribers` | ❌ | List subscribers of a channel |
-| `GET` | `/subscriber/:subscriberId/channels` | ❌ | List channels a user subscribes to |
+| GET | `/comments/video/:videoId` | None | List video comments |
+| POST | `/comments/video/:videoId` | Required | Add comment |
+| PUT | `/comments/:commentId` | Required | Update comment |
+| DELETE | `/comments/:commentId` | Required | Delete comment |
 
-### 📊 Dashboard — `/api/v1/dashboard`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `GET` | `/:channelId/stats` | ❌ | Channel statistics (views, subs, likes) |
-| `GET` | `/:channelId/videos` | ❌ | All videos for a channel |
-
-### 🩺 Health — `/api/v1`
+### Likes
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/health` | ❌ | Liveness probe |
+| POST | `/likes/video/:videoId/toggle` | Required | Toggle video like |
+| POST | `/likes/comment/:commentId/toggle` | Required | Toggle comment like |
+| POST | `/likes/tweet/:tweetId/toggle` | Required | Toggle tweet like |
+| GET | `/likes/videos` | Required | Get liked videos |
+
+### Playlists
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/playlists` | Required | Create playlist |
+| GET | `/playlists/user/:userId` | None | List user playlists |
+| GET | `/playlists/:playlistId` | None | Get playlist details |
+| PUT | `/playlists/:playlistId` | Required | Update playlist |
+| DELETE | `/playlists/:playlistId` | Required | Delete playlist |
+| POST | `/playlists/:playlistId/video/:videoId` | Required | Add video to playlist |
+| DELETE | `/playlists/:playlistId/video/:videoId` | Required | Remove video from playlist |
+
+### Subscriptions
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/subscriptions/:channelId/toggle` | Required | Subscribe/unsubscribe |
+| GET | `/subscriptions/:channelId/subscribers` | None | Channel subscribers |
+| GET | `/subscriptions/subscriber/:subscriberId/channels` | None | User subscriptions |
+
+### Dashboard
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/dashboard/:channelId/stats` | None | Channel metrics |
+| GET | `/dashboard/:channelId/videos` | None | Channel videos |
+
+### Health
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/health` | None | Liveness probe |
 
 ---
 
-## 📝 Environment Variables Reference
+## 📝 Environment Variables
 
-| Variable | Required | Description |
+| Variable | Required | Purpose |
 |---|---|---|
-| `PORT` | ✅ | Server port (default `8000`) |
+| `PORT` | ✅ | Server port |
 | `MONGODB_URI` | ✅ | MongoDB connection string |
 | `CORS_ORIGIN` | ✅ | Allowed frontend origin |
-| `JWT_SECRET` | ✅ | Secret for signing access tokens |
-| `JWT_EXPIRY` | ✅ | Access token TTL (e.g. `1d`) |
-| `REFRESH_TOKEN_SECRET` | ✅ | Secret for signing refresh tokens |
-| `REFRESH_TOKEN_EXPIRY` | ✅ | Refresh token TTL (e.g. `10d`) |
+| `ACCESS_TOKEN_SECRET` | ✅ | JWT access secret |
+| `JWT_SECRET` | ✅ | JWT secret |
+| `JWT_EXPIRY` | ✅ | Access token expiry |
+| `REFRESH_TOKEN_SECRET` | ✅ | Refresh token secret |
+| `REFRESH_TOKEN_EXPIRY` | ✅ | Refresh token expiry |
 | `CLOUDINARY_NAME` | ✅ | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | ✅ | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | ✅ | Cloudinary API secret |
 
 ---
 
-## 🔧 Available Scripts
+## ⚙️ Scripts
 
 | Script | Command | Description |
 |---|---|---|
-| `dev` | `npm run dev` | Start dev server with Nodemon + dotenv auto-injection |
+| `dev` | `npm run dev` | Start development server |
 | `start` | `npm start` | Start production server |
-| `prettier` | `npm run prettier` | Format all source files with Prettier |
-| `postman:test` | `npm run postman:test` | Run Postman collection via Newman |
-
----
-
-## 🔐 Security
-
-- **JWT Authentication** — stateless access tokens for protected routes
-- **bcrypt** password hashing
-- **CORS** — configurable allowed origin
-- **Cookie Parser** — for secure cookie-based token delivery
-- **Environment Variables** — all secrets kept out of source control via `.env`
+| `prettier` | `npm run prettier` | Format code |
+| `postman:test` | `npm run postman:test` | Run Newman tests |
 
 ---
 
 ## 📤 File Uploads
 
-1. **Multer** receives `multipart/form-data` and stores files temporarily under `./public/temp/`
-2. Files are streamed to **Cloudinary** and the returned URL is persisted in MongoDB
-3. The local temp file is deleted after successful upload
+File uploads are handled through Multer and Cloudinary with immediate temp-file cleanup.
 
 ---
 
 ## 🐛 Error Handling
 
-- `asyncHandler` — wraps every async controller so unhandled rejections propagate to Express
-- `ApiError` — custom error class with HTTP status codes and descriptive messages
-- `ApiResponse` — uniform success response envelope `{ statusCode, data, message, success }`
+Errors are normalized across the application using middleware and custom error classes.
+
+- `asyncHandler` for async controller error flow
+- `ApiError` for structured HTTP errors
+- `Apiresponse` for consistent success responses
+
+---
+
+## 🔒 Security
+
+- JWT authentication
+- `bcrypt` hashed passwords
+- CORS restricted origin
+- Secure token handling via cookies and headers
+- Secrets stored in `.env`
 
 ---
 
 ## 🧪 Testing
 
+Run integration tests using:
+
 ```bash
-# Run Newman (Postman) integration tests
 npm run postman:test
 ```
 
-Test documentation lives in `tests/*.test.md` covering users, videos, tweets, comments, likes, playlists, subscriptions, dashboard, error handling, performance, and integration scenarios.
+The `tests/` directory contains documented scenarios for coverage and behavior.
 
 ---
 
 ## 🤝 Contributing
 
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Commit your changes: `git commit -m 'feat: add your feature'`
-3. Push to the branch: `git push origin feature/your-feature`
-4. Open a Pull Request
+1. Fork the repository.
+2. Create a feature branch.
+3. Implement changes.
+4. Run `npm run prettier`.
+5. Open a PR to `main`.
 
-Please run `npm run prettier` before committing and follow the conventions in [PROJECT_RULES.md](./PROJECT_RULES.md).
-
----
-
-## 📚 Further Reading
-
-- [PROJECT_RULES.md](./PROJECT_RULES.md) — Project-specific conventions and rules
-- [GSD-STYLE.md](./GSD-STYLE.md) — Code style guidelines
-- [tests/README.md](./tests/README.md) — Test setup and runner instructions
+Refer to [PROJECT_RULES.md](./PROJECT_RULES.md) and [GSD-STYLE.md](./GSD-STYLE.md).
 
 ---
 
 ## 👤 Author
 
-**Bhavya Varshney** — bhavyavarshney749@gmail.com
+**Bhavya Varshney** — [bhavyavarshney749@gmail.com](mailto:bhavyavarshney749@gmail.com)
 
 ---
 
-**Last Updated**: May 31, 2026 | **Version**: 1.0.0 | **Status**: Backend Complete ✅
+<div align="center">
+
+**Last Updated:** June 1, 2026 · **Status:** Backend Core Complete ✅ · Auth Hardening 🚧
+
+</div>

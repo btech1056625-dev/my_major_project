@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { toggleCommentLike, toggleTweetLike, toggleVideoLike, getLikedVideos } from "../controllers/like.controller.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.route("/video/:videoId/toggle").post(authMiddleware, toggleVideoLike);
-router.route("/comment/:commentId/toggle").post(authMiddleware, toggleCommentLike);
-router.route("/tweet/:tweetId/toggle").post(authMiddleware, toggleTweetLike);
-router.route("/videos").get(authMiddleware, getLikedVideos);
+// ---------------------------------------------------------------------------
+// All like endpoints are protected — you must be logged in to like/unlike
+// ---------------------------------------------------------------------------
+router.route("/video/:videoId/toggle").post(verifyJWT, toggleVideoLike);
+router.route("/comment/:commentId/toggle").post(verifyJWT, toggleCommentLike);
+router.route("/tweet/:tweetId/toggle").post(verifyJWT, toggleTweetLike);
+router.route("/videos").get(verifyJWT, getLikedVideos);
 
 export default router;

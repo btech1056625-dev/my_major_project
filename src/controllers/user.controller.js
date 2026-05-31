@@ -4,6 +4,7 @@ import { APIError } from '../utils/apierror.js';
 import { uploadToCloudinary } from '../utils/cloudinary.js';
 import { APIResponse } from '../utils/apiresponse.js';
 import { Playlist } from '../models/playlist.model.js';
+import jwt from 'jsonwebtoken';
 
 const registerUser = asynchandler(async (req, res) => {
     const { username, email, fullName, password } = req.body;
@@ -97,14 +98,109 @@ const loginUser = asynchandler(async (req, res) => {
     // Step 6: Fetch user data without sensitive info
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-    // Step 7: Return success response with tokens
-    return res.status(200).json(
-        new APIResponse("User logged in successfully", 200, {
-            user: loggedInUser,
-            accessToken,
-            refreshToken
+    // Step 7: Set httpOnly cookies and return tokens in the response body
+    const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, {
+            ...cookieOptions,
+            maxAge: 24 * 60 * 60 * 1000  // 1 day in ms
         })
+        .cookie("refreshToken", refreshToken, {
+            ...cookieOptions,
+            maxAge: 10 * 24 * 60 * 60 * 1000  // 10 days in ms
+        })
+        .json(
+            new APIResponse("User logged in successfully", 200, {
+                user: loggedInUser,
+                accessToken,
+                refreshToken
+            })
+        );
+});
+
+// ---------------------------------------------------------------------------
+// Logout — clears refresh token from DB and invalidates cookies
+// Route: POST /api/v1/users/logout  (requires verifyJWT)
+// ---------------------------------------------------------------------------
+const logoutUser = asynchandler(async (req, res) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        { $unset: { refreshToken: 1 } },
+        { new: true }
     );
+
+    const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", cookieOptions)
+        .clearCookie("refreshToken", cookieOptions)
+        .json(new APIResponse("User logged out successfully", 200, {}));
+});
+
+// ---------------------------------------------------------------------------
+// Refresh Access Token — issues a new access + refresh token pair
+// Route: POST /api/v1/users/refresh-token  (public — uses refresh token)
+// ---------------------------------------------------------------------------
+const refreshAccessToken = asynchandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (!incomingRefreshToken) {
+        throw new APIError("Refresh token is required", 401);
+    }
+
+    // Verify the incoming refresh token
+    const decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decoded._id);
+
+    if (!user) {
+        throw new APIError("Invalid refresh token — user not found", 401);
+    }
+
+    // Confirm it matches the token stored in the database
+    if (incomingRefreshToken !== user.refreshToken) {
+        throw new APIError("Refresh token has been used or revoked", 401);
+    }
+
+    // Rotate both tokens
+    const newAccessToken = user.generateAccessToken();
+    const newRefreshToken = user.generateRefreshToken();
+
+    user.refreshToken = newRefreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", newAccessToken, {
+            ...cookieOptions,
+            maxAge: 24 * 60 * 60 * 1000
+        })
+        .cookie("refreshToken", newRefreshToken, {
+            ...cookieOptions,
+            maxAge: 10 * 24 * 60 * 60 * 1000
+        })
+        .json(
+            new APIResponse("Access token refreshed successfully", 200, {
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken
+            })
+        );
 });
 
 // Get user's liked videos
@@ -190,4 +286,12 @@ const getUserProfile = asynchandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser, getUserLikedVideos, getUserLikedPlaylist, getUserProfile };
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    getUserLikedVideos,
+    getUserLikedPlaylist,
+    getUserProfile
+};

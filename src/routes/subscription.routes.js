@@ -1,10 +1,14 @@
 import { Router } from "express";
 import { toggleSubscription, getUserChannelSubscribers, getSubscribedChannels } from "../controllers/subscription.controller.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.route("/:channelId/toggle").post(authMiddleware, toggleSubscription);
+// ---------------------------------------------------------------------------
+// Public — GET subscribers / subscribed channels (read without login)
+// Protected — POST toggle subscription (must be logged in)
+// ---------------------------------------------------------------------------
+router.route("/:channelId/toggle").post(verifyJWT, toggleSubscription);
 router.route("/:channelId/subscribers").get(getUserChannelSubscribers);
 router.route("/subscriber/:subscriberId/channels").get(getSubscribedChannels);
 
