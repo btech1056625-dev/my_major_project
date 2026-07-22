@@ -6,13 +6,41 @@
 
 ## 📌 Overview
 
-A modern REST API for seamless video, tweet, comment, like, playlist, and subscription workflows.
+A modern REST API for seamless video, tweet, comment, like, playlist, and subscription workflows. The repository also contains `Sentiment.ipynb`, an end-to-end notebook that trains and evaluates binary sentiment classifiers on tweets.
 
 This backend is built for frontend-agnostic integration and follows a clean MVC-style architecture with robust middleware, centralized error handling, and media upload support.
 
 ---
 
-## ✨ Highlights
+## 🧠 Sentiment Analysis
+
+[`Sentiment.ipynb`](./Sentiment.ipynb) implements a binary Twitter sentiment-analysis pipeline. It uses the Sentiment140 training CSV (`training.1600000.processed.noemoticon.csv`), where label `0` is negative and label `4` is mapped to positive.
+
+The notebook covers:
+
+- archive extraction, inspection, text cleaning, label encoding, and stratified sampling (up to 100,000 tweets);
+- exploratory analysis including class balance, text-length distributions, bigrams, and word clouds;
+- TF-IDF features with Logistic Regression, Multinomial Naive Bayes, Linear SVC, and Random Forest baselines;
+- a TensorFlow Bidirectional LSTM classifier using 20,000 vocabulary terms and sequences of length 50;
+- classification reports, a confusion matrix, training curves, and manual prediction checks;
+- export of `tfidf_vectorizer.pkl`, `tokenizer.pkl`, `bilstm_sentiment_model.keras`, and `logistic_regression_model.pkl`, plus a small `SentimentDeployment` prediction wrapper.
+
+### Run the notebook
+
+The notebook is set up for Google Colab. Upload the Sentiment140 archive and update `zip_path` in the data-loading cell if its name or location differs from `/content/archive (5).zip`. The archive must contain `training.1600000.processed.noemoticon.csv`.
+
+For a local Jupyter environment, install the notebook dependencies and set `zip_path` to your local archive path:
+
+```bash
+pip install pandas numpy matplotlib seaborn wordcloud scikit-learn tensorflow joblib jupyter
+jupyter notebook Sentiment.ipynb
+```
+
+Model artifacts are created in the directory from which the notebook runs; they are not committed to this repository.
+
+---
+
+## ✨ Backend Highlights
 
 - **Video publishing:** upload, edit, delete, publish/unpublish
 - **Social microblogging:** create, update, delete tweets
@@ -37,6 +65,7 @@ This backend is built for frontend-agnostic integration and follows a clean MVC-
 | Configuration | dotenv / dotenv-flow |
 | Testing | Jest + Newman |
 | Formatting | Prettier |
+| ML analysis | pandas, scikit-learn, TensorFlow, Jupyter |
 
 ---
 
@@ -114,6 +143,7 @@ MY_MAJOR_PROJECT/
 │   ├── *.test.md
 │   └── helpers/
 ├── public/temp/
+├── Sentiment.ipynb
 ├── .env
 ├── .gitignore
 ├── jest.config.js
@@ -296,8 +326,14 @@ Refer to [PROJECT_RULES.md](./PROJECT_RULES.md) and [GSD-STYLE.md](./GSD-STYLE.m
 
 ---
 
+## 🤝 Contributors
+
+- **Sahaj Pharkya** — Sentiment analysis notebook, model training, evaluation, and deployment workflow
+
+---
+
 <div align="center">
 
-**Last Updated:** June 1, 2026 · **Status:** Backend Core Complete ✅ · Auth Hardening 🚧
+**Last Updated:** July 22, 2026 · **Status:** Backend Core Complete ✅ · Sentiment Analysis Added ✅ · Auth Hardening 🚧
 
 </div>
