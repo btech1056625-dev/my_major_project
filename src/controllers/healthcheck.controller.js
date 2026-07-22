@@ -10,6 +10,9 @@ const healthcheck = asynchandler(async (req, res) => {
     return res.status(200).json(
         new APIResponse("OK", 200, { message: "Server is healthy" })
     );
+
+    // error
+    
 });
 
 export {
